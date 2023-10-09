@@ -1,37 +1,29 @@
-// 20230914
-// noiseとfloorで色分けして境界を縁取り
+// 20230927
+// リサジュー図形
 
+let base_h0;
 let base_h;
-let depth = 0;
 let cv;
 
 function setup() {
-  base_h = random(360);
-
   cv = createCanvas(800, 800);
   pixelDensity(pixelDensity());
   angleMode(DEGREES);
-  colorMode(HSB, 360, 100, 100);
+  colorMode(HSB, 360, 100, 100, 100);
   noLoop();
 }
 
 
 function draw() {
   draw_floor();
-  
   let box_size = min(width, height) * 0.5;
   let xpos = (width - box_size) / 2; 
   let ypos = (height - box_size) / 2; 
-
   let frame_width = 10;
-
-  stroke('#444');
   let cell_num = 5;
   let cell_size = box_size / cell_num;
   draw_image(xpos, ypos, box_size, cell_num);
-  
   draw_frame(xpos, ypos, box_size, frame_width);
-  
   // smart phone shadow
   let sc = 1.4;
   for (let i = 0; i < 10; i++) {
@@ -39,145 +31,53 @@ function draw() {
   }  
 }
 
+///////////////// DRAW IMAGE  ///////////////////////
+
 function draw_image(x, y, size, cell_num) {
+  base_h0 = random(360);
   for (let i = 0; i < cell_num; i++) {
     for (let j = 0; j < cell_num; j++) {
       let cell_size = int(size / cell_num);
       let x0 = x + i * cell_size;
       let y0 = y + j * cell_size;
+      base_h = int(base_h0 + random(100)) % 360;
       fillrect(x0, y0, cell_size);
+      stroke('#444');
+      noFill();
+      rect(x0, y0, cell_size);
     }
   }
 }
 
 function fillrect(x, y, s) {
-  let h = base_h + random() * 180;
-  fill(h, 30, 100);
-  noStroke();
 
-  let sc = 0.003 + random() * 0.006;
-  let r = random(100);
-  let step = int(random(20)) + 10;
-  let hues = [];
-  for (let i = 0; i < step; i++) {
-    hues[i] = (h + int(random(50))) % 360;
-  }
+  noStroke();  
+  fill(base_h, 5, 100);
+  rect(x, y, s);
 
-  for (let sy = 0; sy < s; sy++) {
-    for (let sx = 0; sx < s; sx++) {
-      let n = noise(r + sx * sc, r + sy * sc);
-      n = floor(n * step);
-      let n1 = noise(r + (sx-1) * sc, r + sy * sc);
-      n1 = floor(n1 * step);
-      let n2 = noise(r + (sx+1) * sc, r + sy * sc);
-      n2 = floor(n2 * step);
-      let n3 = noise(r + sx * sc, r + (sy-1) * sc);
-      n3 = floor(n3 * step);
-      let n4 = noise(r + sx * sc, r + (sy+1) * sc);
-      n4 = floor(n4 * step);
-
-      let b = (n % 2 == 0) ? 100 : 85;
-      let s = (n % 2 == 0) ? 25 : 20;
-      
-      if (n != n1 || n != n2 || n != n3 || n != n4) {
-        b = 50;
-      }
-      
-      stroke(color(hues[n], s, b));
-      strokeWeight(2);
-      point(x + sx, y + sy);
-    }
-  }
+  let hs = s / 2;
+  let cx = x + hs;
+  let cy = y + hs;
   
-  stroke('#444');
-  noFill();
+  let sc = s * 0.33;
+  let h = base_h;
   strokeWeight(1);
-  rect(x,y,s);  
-}
-
-
-
-
-function draw_imagex(x, y, size) {
-
-  let cell_num = 5;
-  let g = createGraphics(size * 2, size * 2);
-  g.colorMode(HSB, 360, 100, 100);
-  g.angleMode(DEGREES);
-  g.pixelDensity(pixelDensity());
-  for (let i = 0; i < cell_num; i++) {
-    for (let j = 0; j < cell_num; j++) {
-      g.clear();
-
-      let cell_size = size / cell_num ;
-
-      let x0 = i * cell_size;
-      let y0 = j * cell_size;
-
-      let vnum = 4 + int(random(8));
-      let hs = cell_size;
-      let theta1 = 360 / vnum;
-      let r1 = size * 0.48;
-      let px0, py0;
-      let px = [];
-      let py = [];
-      let t = 0;
-      // calc vertex
-      for (let k = 0; k < vnum; k++) {
-        px0 = 0;
-        py0 = -r1;
-        px[k] = hs + px0 * cos(t) - py0 * sin(t);
-        py[k] = hs + px0 * sin(t) + py0 * cos(t);
-        t += theta1;
-      }
-  
-      g.strokeWeight(1);
-      g.stroke('#222');
-      for (let k = 0; k < vnum; k++) {
-        let h = (base_h + random(150)) % 360;
-        g.fill(h, 30, 100);    
-        g.triangle(hs, hs, px[k], py[k], px[(k + 1) % vnum], py[(k + 1) % vnum]);
-      }  
-      
-
-      let bh = (base_h + random(150)) % 360;      
-      stroke('#666');
-      strokeWeight(1);
-      fill(bh, 30, 100);
-      rect(x + x0, y + y0, cell_size, cell_size);
-      
-      // rotation center
-      //g.stroke('black');
-      //g.strokeWeight(10);
-      //g.point(cell_size, cell_size);
-        
-      let rot = random(30) + 10;
-
-      for (let sy = -cell_size; sy < cell_size; sy++) {
-        for (let sx = -cell_size; sx < cell_size; sx++) {
-          let stx = sx + cell_size;
-          let sty = sy + cell_size;
-          let d = -dist(sx, sy, 0, 0);
-          let t = rot * d / 10;
-          //let dx = sx  + cell_size / 2;
-          //let dy = sy  + cell_size / 2;
-          let dx = sx * cos(t) - sy * sin(t) + cell_size / 2;
-          let dy = sx * sin(t) + sy * cos(t) + cell_size / 2;
-          if (dist(dx, dy, cell_size / 2, cell_size / 2) < cell_size * 0.4) {
-            image(g, x + x0 + dx, y + y0 + dy, 1, 1, stx, sty, 1, 1);
-          }
-        }
-      }
-      strokeWeight(2);
-      stroke(bh, 30, 50, 0.4);
-      noFill();
-      circle(x + x0 + cell_size / 2, y + y0 + cell_size / 2, cell_size * 0.4 * 2);
-    }
+  let ratio = 0.25 * int(random(3)) + 2;
+  let ph = random(360);
+  for (let th = 0; th < 360 * 2; th++) {
+    let px0 = cx + sin(th) * sc;
+    let py0 = cy + sin(th * ratio + ph) * sc;
+    let px1 = cx + sin(th + 180) * sc;
+    let py1 = cy + sin((th + 180) * ratio + ph) * sc;
+    stroke(h, 40, 70, 100);
+    point(px0, py0);
+    point(px1, py1);
+    stroke(h, 40, 100, 8);
+    line(px0, py0, px1, py1);
   }
-
 }
 
-
+//////////////////////////////////////////////////
 
 function draw_frame(x, y, box_size, frame_size) {
   // frame
