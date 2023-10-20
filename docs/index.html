@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <meta charset=utf-8>
@@ -83,13 +84,53 @@ a:active  { color: #b0b0b8; text-decoration:none; }
   box-shadow: 5px 5px 5px 1px rgba(0, 0, 0, .3);
 }
 
+#arrows {
+  position: absolute;
+  height: 100%;
+  width: 90%;
+vertical-align: middle;
+}
+
+#left_arrow {
+  font-size: 30px;
+  position: absolute;
+  top: 50vh;
+  left: 0px;
+  width: 1em;
+  height: 1em;
+  border-bottom: 0.2em solid rgba(255, 255, 255, .2);
+  border-left: 0.2em solid rgba(255, 255, 255, .2);
+  -webkit-transform: rotate(45deg);
+  transform: rotate(45deg);
+  cursor: pointer;
+}
+
+#right_arrow {
+  font-size: 30px;
+  position: absolute;
+  top: 50vh;
+  right: 0px;
+  width: 1em;
+  height: 1em;
+  border-bottom: 0.2em solid rgba(255, 255, 255, .2);
+  border-left: 0.2em solid rgba(255, 255, 255, .2);
+  -webkit-transform: rotate(-90deg);
+  transform: rotate(-135deg);
+  cursor: pointer;
+}
+
+
 </style>
 
 <body>
 <a href="https://github.com/aike/dailycoding"><h1>p5.js daily coding <span id="author">by aike</span></h1></a>
 <div id="zmback">
-<img id="zmimg" src = "">
-<div id="caption">日本語のタイトル<br />20230101</div>
+  <img id="zmimg" src = "">
+  <div id="caption">タイトル<br />20230101</div>
+  <div id="arrows">
+    <div id="left_arrow"></div>
+    <div id="right_arrow"></div>
+  </div>
 </div>
 
 <script>
@@ -110,24 +151,86 @@ const zoom = document.querySelectorAll(".zm");
 const zoomback = document.querySelector("#zmback");
 const zoomimg = document.querySelector("#zmimg");
 const caption = document.querySelector("#caption");
+const arrow_l = document.querySelector("#left_arrow");
+const arrow_r = document.querySelector("#right_arrow");
+
+let currentContent;
+let contentTitle;
+let contentCaption;
 
 zoom.forEach((v) => { v.addEventListener("click", zoomIn); });
 
 function zoomIn(e) {
+  currentContent = e.target;
   zoomback.style.display = "flex";
-  zoomimg.setAttribute("src", e.target.getAttribute("src"));
+  zoomimg.setAttribute("src", currentContent.getAttribute("src"));
   zoomimg.classList.add("upimage");
-  const t = e.target.getAttribute("title");
+  const t = currentContent.getAttribute("title");
   const ts = t.split(" ");
-  caption.innerHTML = ts[0] + "<br />" + ts[1];
+  contentTitle = ts[0];
+  contentCaption = ts[1];
+  caption.innerHTML = contentTitle + "<br />" + contentCaption;
 }
 
 zoomback.addEventListener("click", zoomOut);
 
-function zoomOut() {
-  zoomback.style.display = "none";
-  zoomimg.classList.remove("upimage")
+function zoomOut(e) {
+  if (e.srcElement === arrow_l) {
+    for (let i = 0; i < imgs.length; i++) {
+      if (imgs[i][0] == contentTitle) {
+        swapContent(i - 1);
+        break;
+      }
+    }
+
+  } else if (e.srcElement === arrow_r) {
+    for (let i = 0; i < imgs.length; i++) {
+      if (imgs[i][0] == contentTitle) {
+        swapContent(i + 1);
+        break;
+      }
+    }
+
+  } else {
+    zoomback.style.display = "none";
+    zoomimg.classList.remove("upimage");
+  }
+
 }
+
+function swapContent(idx) {
+  if (idx < 0) {
+    idx += imgs.length;
+  } else if (idx >= imgs.length) {
+    idx = 0;
+  }
+  contentTitle = imgs[idx][0];
+  contentCaption = imgs[idx][1];
+  zoomimg.setAttribute("src", "img/" + contentTitle + ".png");
+  caption.innerHTML = contentTitle + "<br />" + contentCaption;
+}
+
+document.addEventListener('keydown', (e) => {
+	switch (e.key) {
+		case 'ArrowLeft':
+      for (let i = 0; i < imgs.length; i++) {
+        if (imgs[i][0] == contentTitle) {
+          swapContent(i - 1);
+          break;
+        }
+      }
+			break;
+		case 'ArrowRight':
+      for (let i = 0; i < imgs.length; i++) {
+        if (imgs[i][0] == contentTitle) {
+          swapContent(i + 1);
+          break;
+        }
+      }
+			break;
+	}
+	return false;
+});
 
 </script>
 
