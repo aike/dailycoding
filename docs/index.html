@@ -91,11 +91,20 @@ a:active  { color: #b0b0b8; text-decoration:none; }
 vertical-align: middle;
 }
 
-#left_arrow {
-  font-size: 30px;
+#left_clickable {
   position: absolute;
   top: 50vh;
   left: 0px;
+  height: 6em;
+  width: 6em;
+  cursor: pointer;
+}
+
+#left_arrow {
+  font-size: 30px;
+  position: absolute;
+  top: 1em;
+  left: 1em;
   width: 1em;
   height: 1em;
   border-bottom: 0.2em solid rgba(255, 255, 255, .2);
@@ -105,11 +114,25 @@ vertical-align: middle;
   cursor: pointer;
 }
 
-#right_arrow {
-  font-size: 30px;
+#left_arrow:hover {
+  border-bottom: 0.2em solid rgba(255, 255, 255, .7);
+  border-left: 0.2em solid rgba(255, 255, 255, .7);
+}
+
+#right_clickable {
   position: absolute;
   top: 50vh;
   right: 0px;
+  height: 6em;
+  width: 6em;
+  cursor: pointer;
+}
+
+#right_arrow {
+  font-size: 30px;
+  position: absolute;
+  top: 1em;
+  right: 1em;
   width: 1em;
   height: 1em;
   border-bottom: 0.2em solid rgba(255, 255, 255, .2);
@@ -118,6 +141,12 @@ vertical-align: middle;
   transform: rotate(-135deg);
   cursor: pointer;
 }
+
+#right_arrow:hover {
+  border-bottom: 0.2em solid rgba(255, 255, 255, .7);
+  border-left: 0.2em solid rgba(255, 255, 255, .7);
+}
+
 
 
 </style>
@@ -128,8 +157,8 @@ vertical-align: middle;
   <img id="zmimg" src = "">
   <div id="caption">タイトル<br />20230101</div>
   <div id="arrows">
-    <div id="left_arrow"></div>
-    <div id="right_arrow"></div>
+    <div id="left_clickable"><div id="left_arrow"></div></div>
+    <div id="right_clickable"><div id="right_arrow"></div></div>
   </div>
 </div>
 
@@ -153,6 +182,8 @@ const zoomimg = document.querySelector("#zmimg");
 const caption = document.querySelector("#caption");
 const arrow_l = document.querySelector("#left_arrow");
 const arrow_r = document.querySelector("#right_arrow");
+const arrow_lw = document.querySelector("#left_clickable");
+const arrow_rw = document.querySelector("#right_clickable");
 
 let currentContent;
 let contentTitle;
@@ -175,7 +206,7 @@ function zoomIn(e) {
 zoomback.addEventListener("click", zoomOut);
 
 function zoomOut(e) {
-  if (e.srcElement === arrow_l) {
+  if (e.srcElement === arrow_l || e.srcElement === arrow_lw) {
     for (let i = 0; i < imgs.length; i++) {
       if (imgs[i][0] == contentTitle) {
         swapContent(i - 1);
@@ -183,7 +214,7 @@ function zoomOut(e) {
       }
     }
 
-  } else if (e.srcElement === arrow_r) {
+  } else if (e.srcElement === arrow_r || e.srcElement === arrow_rw) {
     for (let i = 0; i < imgs.length; i++) {
       if (imgs[i][0] == contentTitle) {
         swapContent(i + 1);
