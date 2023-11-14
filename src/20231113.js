@@ -111,7 +111,7 @@ function fillrect(g, x0, y0, w) {
     let sx = int(random(w));
     let sy = int(random(w));
 
-    rgbblend(g, x0, y0, px0, py0, pw, ph, (px0 + sx) % 2, (py0 + sy) % w, w);
+    rgbblend(g, x0, y0, px0, py0, pw, ph, (px0 + sx) % w, (py0 + sy) % w, w);
   }
 
 }
