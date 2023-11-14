@@ -1,5 +1,5 @@
-// 20231113
-// 矩形に切り抜き色変換後別の領域にブレンドを繰り返す
+// 20231114
+// 円形に切り抜き色変換後別の領域にブレンドを繰り返す
 
 let base_h0;
 let base_h1;
@@ -77,10 +77,10 @@ function draw_image(x, y, size, cell_num) {
   let y0 = y + dr_i * w;
   base_h = int(base_h0 + random(120)) % 360;
 
-  let g = createGraphics(w, w);
+  let g = createGraphics(w * 3, w * 3);
   g.pixelDensity(pixelDensity());
   fillrect(g, x0, y0, w);
-  image(g, x0, y0, w, w, 0, 0, w, w);  
+  image(g, x0, y0, w, w, w, w, w, w);  
 
   
   // 枠線
@@ -97,35 +97,36 @@ function fillrect(g, x0, y0, w) {
   let h = base_h + random() * 180;
   g.fill(h, 50, 100);
   g.noStroke();
-  g.rect(0, 0, w);
+  g.rect(0, 0, w * 2);
   
-  // glitch
   g.colorMode(RGB, 255, 255, 255);
-
   n = 5 + int(random(20));
   for (let i = 0; i < n; i++) {
-    let px0 = int(random(w / 2));
-    let py0 = int(random(w));
-    let pw = int(random(w) + w / 4);
-    let ph = pw;
-    let sx = int(random(w));
-    let sy = int(random(w));
+    let px0 = int(random(w) + w);
+    let py0 = int(random(w) + w);
+    let pr = int(random(w / 3) + w / 4);
+    let px1 = int(random(w) + w);
+    let py1 = int(random(w) + w);
 
-    rgbblend(g, x0, y0, px0, py0, pw, ph, (px0 + sx) % w, (py0 + sy) % w, w);
+    rgbblend(g, px0, py0, pr, px1, py1, w);
   }
 
 }
 
-function rgbblend(g, x0, y0, sx, sy, w, h, dx, dy, sz) {
+function rgbblend(g, sx, sy, r, dx, dy, sz) {
   let col = Array(3);
   let sfl = [0, 1, 2];
-  let bias = [random() + 0.5, random() + 0.5, random() + 0.5];
+  let bo = 0.6;
+  let bias = [random() + bo, random() + bo, random() + bo];
   shuffle(sfl, true);
   
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      let sc = g.get((sx + x) % sz, (sy + y) % sz);
-      let dc = g.get((dx + x) % sz, (dy + y) % sz);
+  for (let y = 0; y < r * 2; y++) {
+    for (let x = 0; x < r * 2; x++) {
+      let dst = dist(x, y, r, r);
+      if (dst > r)
+        continue;
+      let sc = g.get(sx + x - r, sy + y - r);
+      let dc = g.get(dx + x - r, dy + y - r);
       col[0] = (sc[sfl[0]] + dc[0]) / 2;
       col[1] = (sc[sfl[1]] + dc[1]) / 2;
       col[2] = (sc[sfl[2]] + dc[2]) / 2;
@@ -134,7 +135,7 @@ function rgbblend(g, x0, y0, sx, sy, w, h, dx, dy, sz) {
       col[2] = min(255, col[2] * bias[2]);
       g.stroke(col);
       g.strokeWeight(2);
-      g.point(dx + x, dy + y);        
+      g.point(dx + x - r, dy + y - r);        
     }
   }
 }
