@@ -1,5 +1,5 @@
-// 20231114
-// 円形に切り抜き色変換後別の領域にブレンドを繰り返す
+// 20231115
+// 円形に切り抜きHSB値変換後別の領域にブレンドを繰り返す
 
 let base_h0;
 let base_h1;
@@ -99,8 +99,7 @@ function fillrect(g, x0, y0, w) {
   g.noStroke();
   g.rect(0, 0, w * 3);
   
-  g.colorMode(RGB, 255, 255, 255);
-  n = 5 + int(random(20));
+  n = 13 + int(random(7));
   for (let i = 0; i < n; i++) {
     let px0 = int(random(w) + w);
     let py0 = int(random(w) + w);
@@ -111,6 +110,8 @@ function fillrect(g, x0, y0, w) {
     rgbblend(g, px0, py0, pr, px1, py1, w);
   }
 
+  
+  
 }
 
 function rgbblend(g, sx, sy, r, dx, dy, sz) {
@@ -133,7 +134,7 @@ function rgbblend(g, sx, sy, r, dx, dy, sz) {
       col[0] = min(255, col[0] * bias[0]);
       col[1] = min(255, col[1] * bias[1]);
       col[2] = min(255, col[2] * bias[2]);
-      g.stroke(col);
+      g.stroke(col[0], col[1], col[2]);
       g.strokeWeight(2);
       g.point(dx + x - r, dy + y - r);        
     }
