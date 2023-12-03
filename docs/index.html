@@ -192,7 +192,8 @@ function lazyload() {
   lazyloadThrottleTimeout = setTimeout(function() {
     let scrollTop = window.pageYOffset;
     lazyloadImages.forEach(function(img) {
-      if(img.offsetTop < (window.innerHeight + scrollTop)) {
+      if ((img.getAttribute("lazyload") != null)
+      && (img.offsetTop < (window.innerHeight + scrollTop))) {
         img.src = img.getAttribute("lazyload");
         img.removeAttribute("lazyload");
       }
