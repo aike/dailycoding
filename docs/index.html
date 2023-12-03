@@ -166,17 +166,51 @@ a:active  { color: #b0b0b8; text-decoration:none; }
 
 <script>
 
+imgelems = [];
+
 imgs.reverse().forEach((v) => { 
   const img = document.createElement("img");
   const fname = v[0];
   const desc = v[1];
-  img.setAttribute("src", "img/" + fname + ".png");
+  img.setAttribute("lazyload", "img/" + fname + ".png");
   img.setAttribute("alt", fname);
   img.setAttribute("title", fname + " " + desc);
-  img.setAttribute("loading", "lazy");
+  //img.setAttribute("loading", "lazy");
   img.classList.add("zm");
   document.body.appendChild(img);
+  imgelems.push(img);
 });
+
+function lazyload() {
+  let lazyloadImages = document.querySelectorAll("img[lazyload]");
+  let lazyloadThrottleTimeout;
+
+  if(lazyloadThrottleTimeout) {
+    clearTimeout(lazyloadThrottleTimeout);
+  }
+
+  lazyloadThrottleTimeout = setTimeout(function() {
+    let scrollTop = window.pageYOffset;
+    lazyloadImages.forEach(function(img) {
+      if(img.offsetTop < (window.innerHeight + scrollTop)) {
+        img.src = img.getAttribute("lazyload");
+        img.removeAttribute("lazyload");
+      }
+    });
+    if(lazyloadImages.length == 0) {
+      document.removeEventListener("scroll", lazyload);
+      window.removeEventListener("resize", lazyload);
+      window.removeEventListener("orientationChange", lazyload);
+    }
+  }, 20);
+}
+
+document.addEventListener("scroll", lazyload);
+window.addEventListener("resize", lazyload);
+window.addEventListener("orientationChange", lazyload);
+lazyload();
+
+
 
 const zoom = document.querySelectorAll(".zm");
 const zoomback = document.querySelector("#zmback");
